@@ -6,11 +6,11 @@ use std::sync::Mutex;
 use std::{env, io};
 
 mod config;
-mod hanlders;
+mod handlers;
 mod models;
 
 use config::SERVER_ADDR;
-use hanlders::{get_handle, put_handle};
+use handlers::{get_handle, put_handle};
 use models::Queue;
 
 #[actix_web::main]
