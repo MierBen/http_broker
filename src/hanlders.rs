@@ -1,18 +1,11 @@
 use actix_web::{get, put, rt::time::interval, web, HttpResponse};
-use serde::Deserialize;
 
-use std::collections::{HashMap, VecDeque};
+use std::collections::VecDeque;
 use std::sync::Mutex;
 use std::time::Duration;
 
 use crate::config::QUEUE_MAX_SIZE;
-
-#[derive(Deserialize, Debug)]
-pub struct GetQueue {
-    timeout: Option<u64>,
-}
-
-pub type Queue = HashMap<String, VecDeque<Vec<u8>>>;
+use crate::models::{GetQueue, Queue};
 
 async fn get_from_queue_by_timeout(
     data: &web::Data<Mutex<Queue>>,
@@ -52,7 +45,6 @@ pub async fn get_handle(
     params: web::Query<GetQueue>,
 ) -> HttpResponse {
     let name: String = path.into_inner();
-
     let time = params.into_inner().timeout;
 
     if let Some(time) = time {

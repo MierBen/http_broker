@@ -7,9 +7,11 @@ use std::{env, io};
 
 mod config;
 mod hanlders;
+mod models;
 
 use config::SERVER_ADDR;
-use hanlders::{get_handle, put_handle, Queue};
+use hanlders::{get_handle, put_handle};
+use models::Queue;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
