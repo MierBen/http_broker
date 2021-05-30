@@ -13,7 +13,7 @@ async fn get_from_queue_by_timeout(
     let mut interval = interval(Duration::from_secs(1));
     for _i in 0..time {
         interval.tick().await;
-        if let Ok(value) = get_from_queue(&data, &name).await {
+        if let Ok(value) = get_from_queue(data, name).await {
             return Ok(value);
         }
     }
@@ -28,7 +28,7 @@ async fn get_from_queue(
     if let None = queue.get(name.as_str()) {
         return Err("Value not found!");
     }
-    let value = queue.get_mut(name.as_str()).unwrap();
+    let value = queue.get_mut(name).unwrap();
     if value.is_empty() {
         queue.remove(name.as_str());
         return Err("Value not found!");
