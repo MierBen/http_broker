@@ -5,6 +5,14 @@ use std::time::Duration;
 
 use crate::models::{GetQueue, Queue};
 
+/// Getting value from queue with timeout
+///
+/// # Arguments
+///
+/// * `data` - A queue shared object
+/// * `name` - Name of queue
+/// * `time` - Timeout
+///
 async fn get_from_queue_by_timeout(
     data: &web::Data<Mutex<Queue>>,
     name: &String,
@@ -20,6 +28,13 @@ async fn get_from_queue_by_timeout(
     Err("Can`t get result")
 }
 
+/// Getting value from queue
+///
+/// # Arguments
+///
+/// * `data` - A queue shared object
+/// * `name` - Name of queue
+///
 async fn get_from_queue(
     data: &web::Data<Mutex<Queue>>,
     name: &String,
