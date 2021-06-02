@@ -1,6 +1,6 @@
 use actix_web::{get, rt::time::interval, web, HttpResponse};
+use async_std::sync::Mutex;
 
-use std::sync::Mutex;
 use std::time::Duration;
 
 use crate::models::{GetQueue, Queue};
@@ -15,17 +15,17 @@ use crate::models::{GetQueue, Queue};
 ///
 async fn get_from_queue_by_timeout(
     data: &web::Data<Mutex<Queue>>,
-    name: &String,
+    name: &str,
     time: u64,
-) -> Result<Vec<u8>, &'static str> {
+) -> Option<Vec<u8>> {
     let mut interval = interval(Duration::from_secs(1));
     for _i in 0..time {
         interval.tick().await;
-        if let Ok(value) = get_from_queue(data, name).await {
-            return Ok(value);
+        if let Some(value) = get_from_queue(data, name).await {
+            return Some(value);
         }
     }
-    Err("Can`t get result")
+    None
 }
 
 /// Getting value from queue
@@ -35,20 +35,12 @@ async fn get_from_queue_by_timeout(
 /// * `data` - A queue shared object
 /// * `name` - Name of queue
 ///
-async fn get_from_queue(
-    data: &web::Data<Mutex<Queue>>,
-    name: &String,
-) -> Result<Vec<u8>, &'static str> {
-    let mut queue = data.lock().unwrap();
-    if let None = queue.get(name.as_str()) {
-        return Err("Value not found!");
-    }
-    let value = queue.get_mut(name).unwrap();
-    if value.is_empty() {
-        queue.remove(name.as_str());
-        return Err("Value not found!");
-    }
-    Ok(value.pop_front().unwrap())
+async fn get_from_queue(data: &web::Data<Mutex<Queue>>, name: &str) -> Option<Vec<u8>> {
+    data.lock()
+        .await
+        .get_mut(name)
+        .map(|v| v.pop_front())
+        .flatten()
 }
 
 #[get("/{queue}")]
@@ -61,11 +53,11 @@ pub async fn get_handle(
     let time = params.into_inner().timeout;
 
     if let Some(time) = time {
-        if let Ok(value) = get_from_queue_by_timeout(&data, &name, time).await {
+        if let Some(value) = get_from_queue_by_timeout(&data, &name, time).await {
             return HttpResponse::Ok().body(value);
         }
     } else {
-        if let Ok(value) = get_from_queue(&data, &name).await {
+        if let Some(value) = get_from_queue(&data, &name).await {
             return HttpResponse::Ok().body(value);
         }
     }

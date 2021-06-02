@@ -1,8 +1,7 @@
 use actix_web::{middleware, web, App, HttpServer};
-use dotenv::dotenv;
 
+use async_std::sync::Mutex;
 use std::collections::HashMap;
-use std::sync::Mutex;
 use std::{env, io};
 
 mod config;
@@ -17,11 +16,8 @@ use models::Queue;
 async fn main() -> io::Result<()> {
     env::set_var("RUST_LOG", "actix_web=debug,actix_server=info");
     env_logger::init();
-    dotenv().ok();
 
-    // Create HashMap for Queue
-    let queue: Queue = HashMap::new();
-    let data = web::Data::new(Mutex::new(queue));
+    let data = web::Data::new(Mutex::new(HashMap::new() as Queue));
 
     HttpServer::new(move || {
         App::new()

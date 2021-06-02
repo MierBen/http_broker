@@ -7,11 +7,11 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix-web = "3"
-actix-utils = "2"
+actix-web = "3.3.2"
+actix-utils = "3.0.0"
+async-std = "1.9.0"
 dotenv = "0.15.0"
 dotenv_codegen = "0.15.0"
 env_logger = "0.8"
-indexmap = { version = "1.5.2", features = ["std"] }
-konst = "0.2.4"
+konst = "0.2.0"
 serde = "1"
